@@ -313,7 +313,7 @@ def get_weather_state_map():
             raw_estax = raw_estax.replace("var estax=new Array(", "")
             raw_estax = raw_estax.replace(")", "")
             raw_estax = raw_estax.replace("'", "")
-            # filling array 
+            # filling array
             for i in raw_estax.split(','):
                 estax.append(i.strip())
             #print(estax)
@@ -325,7 +325,7 @@ def get_weather_state_map():
             raw_est = raw_est.replace("est= new Array(", "")
             raw_est = raw_est.replace(")", "")
             raw_est = raw_est.replace('"', "")
-            # filling array 
+            # filling array
             for i in raw_est.split(','):
                 est.append(i.strip())
             #print(est)
