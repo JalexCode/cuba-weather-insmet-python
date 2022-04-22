@@ -34,6 +34,135 @@ MUNICIPALITIES = ["Pinar del Río", "Ciudad de La Habana", "Artemisa", "Mayabequ
 # Cuba zones
 ZONAS= ["occ", "cen", "orn", "ors"]
 
+# classes
+
+class WeatherJSONModel():
+    def __init__(self, date, data):
+        self.date = date
+        self.data = data
+
+    def __str__(self):
+        result = ''
+
+        result += 'Date: {}\n'.format(self.date)
+
+        for l in LOCATIONS:
+            result += '{}:\n'.format(l[0])
+
+            for day in self.data[l[0]]:
+                result += str(day)
+
+            result += '\n'
+
+        return result
+
+
+class WeatherDayModel():
+    def __init__(self, day, data: str):
+        self.day = day
+
+        temps = data[0:5]
+
+        self.tmax, self.tmin = temps.split(' ')
+
+        self.description = data[6:]
+
+    def __str__(self):
+        return '''
+            Day: {}, 
+            Maximum Temperature: {}°C, 
+            Minimum Temperature: {}°C, 
+            Description: {}
+        '''.format(self.day, self.tmax, self.tmin, self.description)
+
+
+# added by @JalexCode
+class TemperatureMap:
+    ''' Class to storage all provinces temperatures map '''
+    def __init__(self, temperatures):
+        self.temperatures: dict = temperatures
+
+    def get_temperatures_map(self) -> dict:
+        return self.temperatures
+
+    def get_temperature(self, city) -> tuple:
+        try:
+            return self.temperatures[city]
+        except KeyError:
+            raise Exception(f"[error] No existe la ciudad {city}")
+
+    def __str__(self) -> str:
+        text = ''
+        for i in range(len(MUNICIPALITIES)):
+            text += MUNICIPALITIES[i] + "\n"
+            text += f"Máximas: {self.temperatures[MUNICIPALITIES[i]][0]}\n"
+            text += f"Mínimas: {self.temperatures[MUNICIPALITIES[i]][1]}\n\n"
+        return text
+
+# added by @JalexCode
+class CityWeather:
+    ''' Class to storage INSMET weather info '''
+    def __init__(self, city, tmax, tmin, tactual, humidity, wind, rain_3_hours, rain_24_hours):
+        self.city = city
+        self.tmax = tmax
+        self.tmin = tmin
+        self.tactual = tactual
+        self.humidity = humidity
+        self.wind = wind
+        self.rain_3_hours = rain_3_hours
+        self.rain_24_hours = rain_24_hours
+
+    def __str__(self) -> str:
+        return f"""Ciudad: {self.city}
+Temperatura máxima: {self.tmax} ºC
+Temperatura mínima: {self.tmin} ºC
+Temperatura actual: {self.tactual} ºC
+Humedad: {self.humidity} %
+Viento: {self.wind}
+Lluvias en 3 horas: {self.rain_3_hours} mm
+Lluvias en 24 horas: {self.rain_24_hours} mm
+"""
+
+
+# added by @JalexCode
+class Wind:
+    ''' Class to storage wind info '''
+    def __init__(self, velocity, direction_angle, direction):
+        self.velocity = velocity
+        self.direction_angle = direction_angle
+        self.direction = direction
+
+    def __str__(self) -> str:
+        text = f"{self.velocity} Km/h ({self.direction_angle}º) {self.direction}"
+        if 'NE' in self.direction:
+            text += " ↗"
+        elif 'SE' in self.direction:
+            text += " ↗"
+        elif 'NO' in self.direction:
+            text += " ↖"
+        elif 'SO' in self.direction:
+            text += " ↙"
+        elif 'N' == self.direction:
+            text += " ↑"
+        elif 'S' == self.direction:
+            text += " ↓"
+        elif 'E' == self.direction:
+            text += " →"
+        elif 'O' == self.direction:
+            text += " ←"
+        return text
+
+# added by @JalexCode
+class WeatherMap:
+    ''' Class to storage Cuba's zones weather state '''
+    def __init__(self, image, state):
+        self.image = image
+        self.state = state
+
+    def __str__(self) -> str:
+        return f"Estado: {self.state}\nImagen: {self.image}\n"
+
+# methods
 def get_forecast():
     url = GENESIS + 'TB0=PLANTILLAS&TB1=PT5'
 
@@ -65,11 +194,11 @@ def get_forecast():
 
 
 # added by @JalexCode
-def get_temperatures_map() -> dict:
+def get_temperatures_map() -> TemperatureMap:
     """Returns a dict with all provinces max and min temperatures
     Returns
     -------
-    dict
+    TemperatureMap
         {"province_name":(max temperature, min temperature), ...}
     """
     url = GENESIS + 'TB0=PLANTILLAS&TB1=PTM&TB2=/Pronostico/pth.txt'
@@ -245,128 +374,3 @@ def get_weather_state_map():
     #
     return weather_state
 
-class WeatherJSONModel():
-    def __init__(self, date, data):
-        self.date = date
-        self.data = data
-
-    def __str__(self):
-        result = ''
-
-        result += 'Date: {}\n'.format(self.date)
-
-        for l in LOCATIONS:
-            result += '{}:\n'.format(l[0])
-
-            for day in self.data[l[0]]:
-                result += str(day)
-
-            result += '\n'
-
-        return result
-
-
-class WeatherDayModel():
-    def __init__(self, day, data: str):
-        self.day = day
-
-        temps = data[0:5]
-
-        self.tmax, self.tmin = temps.split(' ')
-
-        self.description = data[6:]
-
-    def __str__(self):
-        return '''
-            Day: {}, 
-            Maximum Temperature: {}°C, 
-            Minimum Temperature: {}°C, 
-            Description: {}
-        '''.format(self.day, self.tmax, self.tmin, self.description)
-
-
-# added by @JalexCode
-class TemperatureMap:
-    ''' Class to storage all provinces temperatures map '''
-    def __init__(self, temperatures):
-        self.temperatures: dict = temperatures
-
-    def get_temperatures_map(self) -> dict:
-        return self.temperatures
-
-    def get_temperature(self, city) -> tuple:
-        try:
-            return self.temperatures[city]
-        except KeyError:
-            raise Exception(f"[error] No existe la ciudad {city}")
-
-    def __str__(self) -> str:
-        text = ''
-        for i in range(len(MUNICIPALITIES)):
-            text += MUNICIPALITIES[i] + "\n"
-            text += f"Máximas: {self.temperatures[MUNICIPALITIES[i]][0]}\n"
-            text += f"Mínimas: {self.temperatures[MUNICIPALITIES[i]][1]}\n\n"
-
-
-# added by @JalexCode
-class CityWeather:
-    ''' Class to storage INSMET weather info '''
-    def __init__(self, city, tmax, tmin, tactual, humidity, wind, rain_3_hours, rain_24_hours):
-        self.city = city
-        self.tmax = tmax
-        self.tmin = tmin
-        self.tactual = tactual
-        self.humidity = humidity
-        self.wind = wind
-        self.rain_3_hours = rain_3_hours
-        self.rain_24_hours = rain_24_hours
-
-    def __str__(self) -> str:
-        return f"""Ciudad: {self.city}
-Temperatura máxima: {self.tmax} ºC
-Temperatura mínima: {self.tmin} ºC
-Temperatura actual: {self.tactual} ºC
-Humedad: {self.humidity} %
-Viento: {self.wind}
-Lluvias en 3 horas: {self.rain_3_hours} mm
-Lluvias en 24 horas: {self.rain_24_hours} mm
-"""
-
-
-# added by @JalexCode
-class Wind:
-    ''' Class to storage wind info '''
-    def __init__(self, velocity, direction_angle, direction):
-        self.velocity = velocity
-        self.direction_angle = direction_angle
-        self.direction = direction
-
-    def __str__(self) -> str:
-        text = f"{self.velocity} Km/h ({self.direction_angle}º) {self.direction}"
-        if 'NE' in self.direction:
-            text += " ↗"
-        elif 'SE' in self.direction:
-            text += " ↗"
-        elif 'NO' in self.direction:
-            text += " ↖"
-        elif 'SO' in self.direction:
-            text += " ↙"
-        elif 'N' == self.direction:
-            text += " ↑"
-        elif 'S' == self.direction:
-            text += " ↓"
-        elif 'E' == self.direction:
-            text += " →"
-        elif 'O' == self.direction:
-            text += " ←"
-        return text
-
-# added by @JalexCode
-class WeatherMap:
-    ''' Class to storage Cuba's zones weather state '''
-    def __init__(self, image, state):
-        self.image = image
-        self.state = state
-
-    def __str__(self) -> str:
-        return f"Estado: {self.state}\nImagen: {self.image}\n"
