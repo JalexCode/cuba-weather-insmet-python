@@ -13,6 +13,8 @@ print("==================================================")
 print("Mapa de temperaturas")
 tmp_general = api.get_temperatures_map()
 print(tmp_general)
+tmp_cmg = api.get_temperature("Camagüey")
+print(tmp_cmg)
 print("==================================================")
 
 # get national weather
