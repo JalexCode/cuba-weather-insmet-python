@@ -1,6 +1,6 @@
 __version__ = '0.0.1'
 
-from cuba_weather_insmet.insmet_webparser import CityWeather
+from cuba_weather_insmet.insmet_webparser import CityWeather, TemperatureMap
 from cuba_weather_municipality import CubaWeatherMunicipality
 from .repositories import SourceRepository, WeatherRepository
 from .insmet_webparser import CityWeather
@@ -39,19 +39,20 @@ class CubaWeatherInsMet:
             -------
             CityWeather
             """
-        weather = self._weatherRepository.get_weather()
+        weather = self._weatherRepository.get_weather_values_map()
         return weather[input]
 
     # added by @JalexCode
-    def get_temperatures_map(self) -> dict:
-        """Returns a dict with all provinces min and max temperatures
+    def get_temperatures_map(self) -> TemperatureMap:
+        """ Returns a TemperatureMap object
+        Call get_temperatures_map() method in TemperatureMap object to get a dict with all provinces min and max temperatures
         Returns
         -------
-        dict
+        TemperatureMap
             {"province_name":(max temperature, min temperature), ...}
         """
         map = self._weatherRepository.get_temperatures_map()
-        return map.get_temperatures_map()
+        return map
 
     # added by @JalexCode
     def get_temperature(self, city) -> tuple:
@@ -65,7 +66,8 @@ class CubaWeatherInsMet:
             tuple
                 (max temperature, min temperature)
             """
-        return self.get_temperatures_map[city]
+        map:TemperatureMap = self.get_temperatures_map()
+        return map.get_temperature(city)
     
     # added by @JalexCode
     def get_weather_state_map(self) -> dict:
