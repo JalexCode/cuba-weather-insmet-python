@@ -249,7 +249,9 @@ def get_weather_values_map() -> dict:
                         if j == len(weather) + 1:
                             break
                         # if current value is a "null" string, just ignore it
-                        if i == "/" or i == "NaN":
+                        if "/" in i or i == "NaN":
+                            if j == 7:
+                                break
                             weather[j] = 0
                             j += 1
                             continue
@@ -265,6 +267,8 @@ def get_weather_values_map() -> dict:
                             wind[2] = RN[int(v // 22.5)]
                         # if current value is rain info
                         elif j > 5:
+                            if j == 8:
+                                break
                             weather[j - 1] = v
                         else:
                             weather[j] = v
